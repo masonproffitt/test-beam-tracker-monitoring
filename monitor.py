@@ -33,6 +33,8 @@ coordinate_dtype = np.float32
 archive_histograms = True
 histogram_archive_directory_name = 'histogram_archive'
 debug = False
+recent_file_time_threshold = 60
+recent_file_write_check_interval = 0.1
 
 n_points = 3
 n_coordinates_per_point = 2
@@ -175,7 +177,7 @@ while True:
             if not fp.is_file():
                 continue
             mtime =  fp.stat().st_mtime
-            if fp not in tracker_file_mtimes or mtime > tracker_file_mtimes[fp]:
+            if fp not in tracker_file_mtimes:
                 need_to_parse = False
                 if backtrack and mtime > run_start_time:
                     need_to_parse = True
@@ -184,12 +186,26 @@ while True:
                         need_to_parse = True
                     next_latest_tracker_file_mtime = mtime
                 if need_to_parse:
+                    if mtime > tracker_file_directory_update_time - recent_file_time_threshold:
+                        logging.debug(f'recent file: {fp}')
+                        while True:
+                            logging.debug(f'sleeping for {recent_file_write_check_interval} s')
+                            time.sleep(recent_file_write_check_interval)
+                            new_mtime = fp.stat().st_mtime
+                            if new_mtime == mtime:
+                                logging.debug('mtime unchanged')
+                                break
+                            else:
+                                mtime = new_mtime
                     new_coordinates = parse(fp)
                     add_to_histograms(new_coordinates, histograms)
                 tracker_file_mtimes[fp] = mtime
+            elif mtime > tracker_file_mtimes[fp]:
+                logging.warning(f'already parsed file has new mtime: {fp}')
         plot_histograms(histograms)
         latest_tracker_file_mtime = next_latest_tracker_file_mtime
         last_tracker_file_directory_update_time = tracker_file_directory_update_time
 
     logging.debug('main loop end')
+    logging.debug(f'sleeping for {loop_delay} s')
     time.sleep(loop_delay)
