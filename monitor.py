@@ -4,6 +4,7 @@ import csv
 import datetime
 import logging
 from pathlib import Path
+import shutil
 import time
 
 import numpy as np
@@ -153,7 +154,7 @@ def copy_histograms():
         if histogram_plot_path.exists():
             new_histogram_plot_filename = datetime.datetime.now().isoformat(timespec='seconds') + '_' + histogram_plot_filename
             logging.info(f'copying {histogram_plot_filename} to {histogram_archive_directory_path / new_histogram_plot_filename}')
-            histogram_plot_path.copy(histogram_archive_directory_path / new_histogram_plot_filename)
+            shutil.copy(histogram_plot_path, histogram_archive_directory_path / new_histogram_plot_filename)
 
 
 while True:
