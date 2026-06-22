@@ -142,7 +142,7 @@ def plot_histograms(histograms):
         plt.close()
 
 
-def copy_histograms(histograms):
+def copy_histograms():
     histogram_archive_directory_path = Path(histogram_archive_directory_name)
     if not histogram_archive_directory_path.exists():
         logging.info(f'creating {histogram_archive_directory_path}')
@@ -165,7 +165,7 @@ while True:
         if new_run_start_time != run_start_time:
             logging.info(f'read new run start time {time.ctime(new_run_start_time)}')
             if archive_histograms:
-                copy_histograms(histograms)
+                copy_histograms()
             histograms = create_histograms()
             run_start_time = new_run_start_time
             logging.debug(f'{run_start_time=}')
