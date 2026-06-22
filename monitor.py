@@ -137,7 +137,7 @@ def add_to_histograms(coordinates, histograms):
         histograms[0][i][0] += x_hist
         y_hist = np.histogram(coordinates[:, n_coordinates_per_point * i + 1], *y_histogram_args, **y_histogram_kwargs)[0]
         logging.debug(f'{i=} {y_hist=}')
-        histograms[1][i][0] += x_hist
+        histograms[1][i][0] += y_hist
         H = np.histogram2d(coordinates[:, n_coordinates_per_point * i], coordinates[:, n_coordinates_per_point * i + 1], *two_d_histogram_args, **two_d_histogram_kwargs)[0]
         logging.debug(f'{i=} {H=}')
         histograms[2][i][0] += H
