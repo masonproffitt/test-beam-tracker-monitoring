@@ -137,7 +137,37 @@ def plot_histograms(histograms):
         plt.ylabel(y_label)
         plt.colorbar(label=z_label)
         plt.clim(z_min, z_max)
-        histogram_filename = histogram_plot_base_filename + str(i) + histogram_plot_file_extension
+        histogram_filename = histogram_plot_base_filename + str(i + 1) + histogram_plot_file_extension
+        logging.info(f'save {histogram_filename}')
+        plt.savefig(histogram_filename)
+        plt.close()
+
+        plt.title(histogram_plot_base_title + str(i + 1))
+        plt.xlabel(x_label)
+        plt.ylabel(f'Events per {(x_max - x_min) / x_bins} cm')
+        x_profile = H.sum(axis=0)
+        x_dist = []
+        for j in range(len(x_profile)):
+            x_dist += [(xedges[j] + xedges[j + 1]) / 2] * int(x_profile[j])
+        x_dist = np.asarray(x_dist)
+        plt.stairs(x_profile, xedges, label=f'$\\mu$ = {x_dist.mean():.2f} $\\sigma$ = {x_dist.std():.2f}')
+        histogram_filename = histogram_plot_base_filename + str(i + 1) + '_x' + histogram_plot_file_extension
+        plt.legend()
+        logging.info(f'save {histogram_filename}')
+        plt.savefig(histogram_filename)
+        plt.close()
+
+        plt.title(histogram_plot_base_title + str(i + 1))
+        plt.xlabel(y_label)
+        plt.ylabel(f'Events per {(y_max - y_min) / y_bins} cm')
+        y_profile = H.sum(axis=1)
+        y_dist = []
+        for j in range(len(y_profile)):
+            y_dist += [(yedges[j] + yedges[j + 1]) / 2] * int(y_profile[j])
+        y_dist = np.asarray(y_dist)
+        plt.stairs(y_profile, yedges, label=f'$\\mu$ = {y_dist.mean():.2} $\\sigma$ = {y_dist.std():.2}')
+        histogram_filename = histogram_plot_base_filename + str(i + 1) + '_y' + histogram_plot_file_extension
+        plt.legend()
         logging.info(f'save {histogram_filename}')
         plt.savefig(histogram_filename)
         plt.close()
