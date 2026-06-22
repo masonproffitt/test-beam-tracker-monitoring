@@ -28,6 +28,7 @@ z_label = f'Events per {(x_max - x_min) / x_bins} cm $\\times$ {(y_max - y_min) 
 histogram_plot_base_filename = 'test_plot_'
 histogram_plot_base_title = 'Point '
 histogram_plot_file_extension = '.png'
+coordinate_dtype = np.float32
 debug = False
 
 n_points = 3
@@ -90,7 +91,11 @@ def parse(path):
                 continue
             fields = l.split()
             coordinates.append(fields[:n_coordinates_per_point * n_points])
-    coordinates = np.asarray(coordinates, dtype=np.float32)
+    logging.info(f'read {len(coordinates)} hits')
+    if len(coordinates) == 0:
+        coordinates = np.ndarray((0, n_coordinates_per_point * n_points), dtype=coordinate_dtype)
+    else:
+        coordinates = np.asarray(coordinates, dtype=coordinate_dtype)
     logging.debug(f'{coordinates=}')
     return coordinates
 
