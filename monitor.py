@@ -1,6 +1,7 @@
 #!/bin/env python3
 
 import csv
+import datetime
 import logging
 from pathlib import Path
 import time
@@ -29,6 +30,8 @@ histogram_plot_base_filename = 'test_plot_'
 histogram_plot_base_title = 'Point '
 histogram_plot_file_extension = '.png'
 coordinate_dtype = np.float32
+archive_histograms = True
+histogram_archive_directory_name = 'histogram_archive'
 debug = False
 
 n_points = 3
@@ -137,6 +140,19 @@ def plot_histograms(histograms):
         plt.close()
 
 
+def copy_histograms(histograms):
+    histogram_archive_directory_path = Path(histogram_archive_directory_name)
+    if not histogram_archive_directory_path.exists():
+        logging.info(f'creating {histogram_archive_directory_path}')
+        histogram_archive_directory_path.mkdir()
+    for i in range(n_points):
+        histogram_plot_filename = histogram_plot_base_filename + str(i) + histogram_plot_file_extension
+        new_histogram_plot_filename = datetime.datetime.now().isoformat(timespec='seconds') + '_' + histogram_plot_filename
+        logging.info(f'copying {histogram_plot_filename} to {histogram_archive_directory_path / new_histogram_plot_filename}')
+        Path(histogram_plot_filename).copy(histogram_archive_directory_path / new_histogram_plot_filename)
+
+
+histograms = None
 while True:
     logging.debug('main loop start')
 
@@ -145,6 +161,8 @@ while True:
         new_run_start_time = read_run_start_time(run_start_time_path)
         if new_run_start_time != run_start_time:
             logging.info(f'read new run start time {time.ctime(new_run_start_time)}')
+            if histograms and archive_histograms:
+                copy_histograms(histograms)
             histograms = create_histograms()
             run_start_time = new_run_start_time
             logging.debug(f'{run_start_time=}')
