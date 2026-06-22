@@ -157,7 +157,7 @@ def plot_histograms(histograms):
         for j in range(len(x_profile)):
             x_dist += [(x_bin_edges[j] + x_bin_edges[j + 1]) / 2] * int(x_profile[j])
         x_dist = np.asarray(x_dist)
-        plt.stairs(x_profile, x_bin_edges, label=f'$\\mu$ = {x_dist.mean():.2f} $\\sigma$ = {x_dist.std():.2f}')
+        plt.stairs(x_profile, x_bin_edges, label=f'$\\mu$ = {x_dist.mean():.2f} cm, $\\sigma$ = {x_dist.std():.2f} cm')
         x_histogram_plot_filename = histogram_plot_base_filename + str(i + 1) + '_x' + histogram_plot_file_extension
         plt.legend()
         logging.info(f'save {x_histogram_plot_filename}')
@@ -174,7 +174,7 @@ def plot_histograms(histograms):
         for j in range(len(y_profile)):
             y_dist += [(y_bin_edges[j] + y_bin_edges[j + 1]) / 2] * int(y_profile[j])
         y_dist = np.asarray(y_dist)
-        plt.stairs(y_profile, y_bin_edges, label=f'$\\mu$ = {y_dist.mean():.2} $\\sigma$ = {y_dist.std():.2}')
+        plt.stairs(y_profile, y_bin_edges, label=f'$\\mu$ = {y_dist.mean():.2} cm, $\\sigma$ = {y_dist.std():.2} cm')
         y_histogram_plot_filename = histogram_plot_base_filename + str(i + 1) + '_y' + histogram_plot_file_extension
         plt.legend()
         logging.info(f'save {y_histogram_plot_filename}')
