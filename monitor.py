@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import options
 
 
-tracker_file_directory = 'tracker-data-dir'
+tracker_file_directory = '/home/daq/SiTrackerData/ascii_dream_2026'
 backtrack = True
 loop_delay = 1
 x_min = 0
@@ -27,7 +27,7 @@ y_label = '$y$ [cm]'
 z_min = 0
 z_max = None
 z_label = f'Events per {(x_max - x_min) / x_bins} cm $\\times$ {(y_max - y_min) / y_bins} cm'
-histogram_plot_base_filename = 'test_plot_'
+histogram_plot_base_filename = 'beam_profile_'
 histogram_plot_base_title = 'Station '
 histogram_plot_file_extension = '.png'
 coordinate_dtype = np.float32
