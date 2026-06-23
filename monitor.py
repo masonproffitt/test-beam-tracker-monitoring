@@ -36,6 +36,7 @@ histogram_archive_directory_name = 'histogram_archive'
 debug = False
 recent_file_time_threshold = 60
 recent_file_write_check_interval = 0.1
+one_d_histogram_y_axis_rescale_factor = 1.1
 
 n_points = 3
 n_coordinates_per_point = 2
@@ -171,6 +172,7 @@ def plot_histograms(histograms):
             x_std = (x_squared_mean - x_mean ** 2) ** 0.5
         plt.stairs(x_hist, x_bin_edges, label=f'$\\mu$ = {x_mean:.2f} cm, $\\sigma$ = {x_std:.2f} cm')
         x_histogram_plot_filename = histogram_plot_base_filename + str(i + 1) + '_x' + histogram_plot_file_extension
+        plt.ylim(0, one_d_histogram_y_axis_rescale_factor * plt.ylim()[1])
         plt.legend()
         logging.info(f'save {x_histogram_plot_filename}')
         plt.savefig(x_histogram_plot_filename)
@@ -192,6 +194,7 @@ def plot_histograms(histograms):
             y_std = (y_squared_mean - y_mean ** 2) ** 0.5
         plt.stairs(y_hist, y_bin_edges, label=f'$\\mu$ = {y_mean:.2f} cm, $\\sigma$ = {y_std:.2f} cm')
         y_histogram_plot_filename = histogram_plot_base_filename + str(i + 1) + '_y' + histogram_plot_file_extension
+        plt.ylim(0, one_d_histogram_y_axis_rescale_factor * plt.ylim()[1])
         plt.legend()
         logging.info(f'save {y_histogram_plot_filename}')
         plt.savefig(y_histogram_plot_filename)
