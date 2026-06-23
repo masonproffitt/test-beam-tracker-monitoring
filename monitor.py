@@ -78,7 +78,7 @@ two_d_histogram_kwargs = {
 missing_hits_histogram_args = []
 missing_hits_histogram_kwargs = {
     'bins': n_coordinates_per_point * n_points,
-    'range': [0, n_coordinates_per_point * n_points],
+    'range': [0.5, n_coordinates_per_point * n_points + 0.5],
 }
 
 if debug:
@@ -157,7 +157,7 @@ def add_to_histograms(coordinates, histograms):
         H = np.histogram2d(x, y, *two_d_histogram_args, **two_d_histogram_kwargs)[0]
         logging.debug(f'{i=} {H=}')
         histograms[2][i][0] += H
-    missing_hits_hist = np.histogram(np.nonzero(coordinates < 0)[1], *missing_hits_histogram_args, **missing_hits_histogram_kwargs)[0]
+    missing_hits_hist = np.histogram(np.nonzero(coordinates < 0)[1] + 1, *missing_hits_histogram_args, **missing_hits_histogram_kwargs)[0]
     logging.debug(f'{missing_hits_hist=}')
     histograms[3][0] += missing_hits_hist
     return histograms
@@ -227,7 +227,7 @@ def plot_histograms(histograms):
 
     plt.title('Missing hits')
     plt.xlabel('Module')
-    plt.xlim(0, n_coordinates_per_point * n_points)
+    plt.xlim(0.25, n_coordinates_per_point * n_points + 0.75)
     plt.ylabel(f'Events')
     plt.stairs(histograms[3][0], histograms[3][1])
     missing_hits_histogram_plot_filename = missing_hits_base_filename + histogram_plot_file_extension
