@@ -233,8 +233,8 @@ def plot_histograms(histograms):
     plt.xlabel('Module')
     plt.xlim(0.25, n_coordinates_per_point * n_points + 0.75)
     plt.ylabel(f'Events')
-    plt.ylim(0)
     plt.stairs(histograms[3][0], histograms[3][1])
+    plt.ylim(0)
     missing_hits_histogram_plot_filename = missing_hits_base_filename + histogram_plot_file_extension
     logging.info(f'save {missing_hits_histogram_plot_filename}')
     plt.savefig(missing_hits_histogram_plot_filename)
