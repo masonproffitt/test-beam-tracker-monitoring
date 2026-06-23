@@ -27,8 +27,9 @@ y_label = '$y$ [cm]'
 z_min = 0
 z_max = None
 z_label = f'Events per {(x_max - x_min) / x_bins} cm $\\times$ {(y_max - y_min) / y_bins} cm'
-histogram_plot_base_filename = 'beam_profile_'
+histogram_plot_base_filename = 'beam_profile'
 histogram_plot_base_title = 'Station '
+missing_hits_base_filename = 'missing_hits'
 histogram_plot_file_extension = '.png'
 coordinate_dtype = np.float32
 archive_histograms = True
@@ -73,6 +74,11 @@ two_d_histogram_args = []
 two_d_histogram_kwargs = {
     'bins': bins,
     'range': [x_range, y_range],
+}
+missing_hits_histogram_args = []
+missing_hits_histogram_kwargs = {
+    'bins': n_coordinates_per_point * n_points,
+    'range': [0, n_coordinates_per_point * n_points],
 }
 
 if debug:
@@ -126,8 +132,9 @@ def create_histograms():
         x_histograms.append(list(np.histogram([], *x_histogram_args, **x_histogram_kwargs)) + [0, 0])
         y_histograms.append(list(np.histogram([], *y_histogram_args, **y_histogram_kwargs)) + [0, 0])
         two_d_histograms.append(list(np.histogram2d([], [], *two_d_histogram_args, **two_d_histogram_kwargs)))
-    logging.debug(f'{x_histograms=} {y_histograms=} {two_d_histograms=}')
-    return [x_histograms, y_histograms, two_d_histograms]
+    missing_hits_histogram = list(np.histogram([], *missing_hits_histogram_args, **missing_hits_histogram_kwargs))
+    logging.debug(f'{x_histograms=} {y_histograms=} {two_d_histograms=} {missing_hits_histogram=}')
+    return [x_histograms, y_histograms, two_d_histograms, missing_hits_histogram]
 
 
 def add_to_histograms(coordinates, histograms):
@@ -150,6 +157,9 @@ def add_to_histograms(coordinates, histograms):
         H = np.histogram2d(x, y, *two_d_histogram_args, **two_d_histogram_kwargs)[0]
         logging.debug(f'{i=} {H=}')
         histograms[2][i][0] += H
+    missing_hits_hist = np.histogram(np.nonzero(coordinates < 0)[1], *missing_hits_histogram_args, **missing_hits_histogram_kwargs)[0]
+    logging.debug(f'{missing_hits_hist=}')
+    histograms[3][0] += missing_hits_hist
     return histograms
 
 
@@ -171,7 +181,7 @@ def plot_histograms(histograms):
             x_squared_mean = histograms[0][i][3] / x_n_events
             x_std = (x_squared_mean - x_mean ** 2) ** 0.5
         plt.stairs(x_hist, x_bin_edges, label=f'$\\mu$ = {x_mean:.2f} cm, $\\sigma$ = {x_std:.2f} cm')
-        x_histogram_plot_filename = histogram_plot_base_filename + str(i + 1) + '_x' + histogram_plot_file_extension
+        x_histogram_plot_filename = histogram_plot_base_filename + '_' + str(i + 1) + '_x' + histogram_plot_file_extension
         plt.ylim(0, one_d_histogram_y_axis_rescale_factor * plt.ylim()[1])
         plt.legend()
         logging.info(f'save {x_histogram_plot_filename}')
@@ -193,7 +203,7 @@ def plot_histograms(histograms):
             y_squared_mean = histograms[1][i][3] / y_n_events
             y_std = (y_squared_mean - y_mean ** 2) ** 0.5
         plt.stairs(y_hist, y_bin_edges, label=f'$\\mu$ = {y_mean:.2f} cm, $\\sigma$ = {y_std:.2f} cm')
-        y_histogram_plot_filename = histogram_plot_base_filename + str(i + 1) + '_y' + histogram_plot_file_extension
+        y_histogram_plot_filename = histogram_plot_base_filename + '_' + str(i + 1) + '_y' + histogram_plot_file_extension
         plt.ylim(0, one_d_histogram_y_axis_rescale_factor * plt.ylim()[1])
         plt.legend()
         logging.info(f'save {y_histogram_plot_filename}')
@@ -210,10 +220,20 @@ def plot_histograms(histograms):
         plt.ylabel(y_label)
         plt.colorbar(label=z_label)
         plt.clim(z_min, z_max)
-        two_d_histogram_plot_filename = histogram_plot_base_filename + str(i + 1) + histogram_plot_file_extension
+        two_d_histogram_plot_filename = histogram_plot_base_filename + '_' + str(i + 1) + histogram_plot_file_extension
         logging.info(f'save {two_d_histogram_plot_filename}')
         plt.savefig(two_d_histogram_plot_filename)
         plt.close()
+
+    plt.title('Missing hits')
+    plt.xlabel('Module')
+    plt.xlim(0, n_coordinates_per_point * n_points)
+    plt.ylabel(f'Events')
+    plt.stairs(histograms[3][0], histograms[3][1])
+    missing_hits_histogram_plot_filename = missing_hits_base_filename + histogram_plot_file_extension
+    logging.info(f'save {missing_hits_histogram_plot_filename}')
+    plt.savefig(missing_hits_histogram_plot_filename)
+    plt.close()
 
 
 def copy_histograms():
@@ -222,9 +242,9 @@ def copy_histograms():
         logging.info(f'creating {histogram_archive_directory_path}')
         histogram_archive_directory_path.mkdir()
     for i in range(n_points):
-        x_histogram_plot_filename = histogram_plot_base_filename + str(i + 1) + '_x' + histogram_plot_file_extension
-        y_histogram_plot_filename = histogram_plot_base_filename + str(i + 1) + '_y' + histogram_plot_file_extension
-        two_d_histogram_plot_filename = histogram_plot_base_filename + str(i) + histogram_plot_file_extension
+        x_histogram_plot_filename = histogram_plot_base_filename + '_' + str(i + 1) + '_x' + histogram_plot_file_extension
+        y_histogram_plot_filename = histogram_plot_base_filename + '_' + str(i + 1) + '_y' + histogram_plot_file_extension
+        two_d_histogram_plot_filename = histogram_plot_base_filename + '_' + str(i + 1) + histogram_plot_file_extension
         x_histogram_plot_path = Path(x_histogram_plot_filename)
         y_histogram_plot_path = Path(y_histogram_plot_filename)
         two_d_histogram_plot_path = Path(two_d_histogram_plot_filename)
@@ -233,6 +253,12 @@ def copy_histograms():
                 new_histogram_plot_filename = datetime.datetime.now().isoformat(timespec='seconds') + '_' + path.name
                 logging.info(f'copying {path} to {histogram_archive_directory_path / new_histogram_plot_filename}')
                 shutil.copy(path, histogram_archive_directory_path / new_histogram_plot_filename)
+    missing_hits_histogram_plot_filename = missing_hits_base_filename + histogram_plot_file_extension
+    missing_hits_histogram_plot_path = Path(missing_hits_histogram_plot_filename)
+    if missing_hits_histogram_plot_path.exists():
+        new_histogram_plot_filename = datetime.datetime.now().isoformat(timespec='seconds') + '_' + missing_hits_histogram_plot_path.name
+        logging.info(f'copying {missing_hits_histogram_plot_path} to {histogram_archive_directory_path / new_histogram_plot_filename}')
+        shutil.copy(missing_hits_histogram_plot_path, histogram_archive_directory_path / new_histogram_plot_filename)
 
 
 while True:
