@@ -122,8 +122,8 @@ def create_histograms():
     y_histograms = []
     two_d_histograms = []
     for i in range(n_points):
-        x_histograms.append(list(np.histogram([], *x_histogram_args, **x_histogram_kwargs)))
-        y_histograms.append(list(np.histogram([], *y_histogram_args, **y_histogram_kwargs)))
+        x_histograms.append(list(np.histogram([], *x_histogram_args, **x_histogram_kwargs)) + [0, 0])
+        y_histograms.append(list(np.histogram([], *y_histogram_args, **y_histogram_kwargs)) + [0, 0])
         two_d_histograms.append(list(np.histogram2d([], [], *two_d_histogram_args, **two_d_histogram_kwargs)))
     logging.debug(f'{x_histograms=} {y_histograms=} {two_d_histograms=}')
     return [x_histograms, y_histograms, two_d_histograms]
@@ -132,13 +132,21 @@ def create_histograms():
 def add_to_histograms(coordinates, histograms):
     logging.debug('add to histograms')
     for i in range(n_points):
-        x_hist = np.histogram(coordinates[:, n_coordinates_per_point * i], *x_histogram_args, **x_histogram_kwargs)[0]
+        x = coordinates[:, n_coordinates_per_point * i]
+        x_hist = np.histogram(x, *x_histogram_args, **x_histogram_kwargs)[0]
         logging.debug(f'{i=} {x_hist=}')
         histograms[0][i][0] += x_hist
-        y_hist = np.histogram(coordinates[:, n_coordinates_per_point * i + 1], *y_histogram_args, **y_histogram_kwargs)[0]
+        x_mask = (x >= x_min) & (x <= x_max)
+        histograms[0][i][2] += x[x_mask].sum()
+        histograms[0][i][3] += (x[x_mask] ** 2).sum()
+        y = coordinates[:, n_coordinates_per_point * i + 1]
+        y_hist = np.histogram(y, *y_histogram_args, **y_histogram_kwargs)[0]
         logging.debug(f'{i=} {y_hist=}')
         histograms[1][i][0] += y_hist
-        H = np.histogram2d(coordinates[:, n_coordinates_per_point * i], coordinates[:, n_coordinates_per_point * i + 1], *two_d_histogram_args, **two_d_histogram_kwargs)[0]
+        y_mask = (y >= y_min) & (y <= y_max)
+        histograms[1][i][2] += y[y_mask].sum()
+        histograms[1][i][3] += (y[y_mask] ** 2).sum()
+        H = np.histogram2d(x, y, *two_d_histogram_args, **two_d_histogram_kwargs)[0]
         logging.debug(f'{i=} {H=}')
         histograms[2][i][0] += H
     return histograms
@@ -150,14 +158,17 @@ def plot_histograms(histograms):
         plt.title(histogram_plot_base_title + str(i + 1) + ', $x$')
         plt.xlabel(x_label)
         plt.ylabel(f'Events per {(x_max - x_min) / x_bins} cm')
-        # x_profile = H.sum(axis=0)
-        x_profile = histograms[0][i][0]
+        x_hist = histograms[0][i][0]
         x_bin_edges = histograms[0][i][1]
-        x_dist = []
-        for j in range(len(x_profile)):
-            x_dist += [(x_bin_edges[j] + x_bin_edges[j + 1]) / 2] * int(x_profile[j])
-        x_dist = np.asarray(x_dist)
-        plt.stairs(x_profile, x_bin_edges, label=f'$\\mu$ = {x_dist.mean():.2f} cm, $\\sigma$ = {x_dist.std():.2f} cm')
+        x_n_events = histograms[0][i][0].sum()
+        if x_n_events == 0:
+            x_mean = float('nan')
+            x_std = float('nan')
+        else:
+            x_mean = histograms[0][i][2] / x_n_events
+            x_squared_mean = histograms[0][i][3] / x_n_events
+            x_std = (x_squared_mean - x_mean ** 2) ** 0.5
+        plt.stairs(x_hist, x_bin_edges, label=f'$\\mu$ = {x_mean:.2f} cm, $\\sigma$ = {x_std:.2f} cm')
         x_histogram_plot_filename = histogram_plot_base_filename + str(i + 1) + '_x' + histogram_plot_file_extension
         plt.legend()
         logging.info(f'save {x_histogram_plot_filename}')
@@ -167,14 +178,17 @@ def plot_histograms(histograms):
         plt.title(histogram_plot_base_title + str(i + 1) + ', $y$')
         plt.xlabel(y_label)
         plt.ylabel(f'Events per {(y_max - y_min) / y_bins} cm')
-        y_profile = histograms[1][i][0]
+        y_hist = histograms[1][i][0]
         y_bin_edges = histograms[1][i][1]
-        # y_profile = H.sum(axis=1)
-        y_dist = []
-        for j in range(len(y_profile)):
-            y_dist += [(y_bin_edges[j] + y_bin_edges[j + 1]) / 2] * int(y_profile[j])
-        y_dist = np.asarray(y_dist)
-        plt.stairs(y_profile, y_bin_edges, label=f'$\\mu$ = {y_dist.mean():.2} cm, $\\sigma$ = {y_dist.std():.2} cm')
+        y_n_events = histograms[1][i][0].sum()
+        if y_n_events == 0:
+            y_mean = float('nan')
+            y_std = float('nan')
+        else:
+            y_mean = histograms[1][i][2] / y_n_events
+            y_squared_mean = histograms[1][i][3] / y_n_events
+            y_std = (y_squared_mean - y_mean ** 2) ** 0.5
+        plt.stairs(y_hist, y_bin_edges, label=f'$\\mu$ = {y_mean:.2f} cm, $\\sigma$ = {y_std:.2f} cm')
         y_histogram_plot_filename = histogram_plot_base_filename + str(i + 1) + '_y' + histogram_plot_file_extension
         plt.legend()
         logging.info(f'save {y_histogram_plot_filename}')
