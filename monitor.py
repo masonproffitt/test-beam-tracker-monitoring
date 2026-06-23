@@ -157,6 +157,7 @@ def plot_histograms(histograms):
     for i in range(n_points):
         plt.title(histogram_plot_base_title + str(i + 1) + ', $x$')
         plt.xlabel(x_label)
+        plt.xlim(x_min, x_max)
         plt.ylabel(f'Events per {(x_max - x_min) / x_bins} cm')
         x_hist = histograms[0][i][0]
         x_bin_edges = histograms[0][i][1]
@@ -177,6 +178,7 @@ def plot_histograms(histograms):
 
         plt.title(histogram_plot_base_title + str(i + 1) + ', $y$')
         plt.xlabel(y_label)
+        plt.xlim(y_min, y_max)
         plt.ylabel(f'Events per {(y_max - y_min) / y_bins} cm')
         y_hist = histograms[1][i][0]
         y_bin_edges = histograms[1][i][1]
