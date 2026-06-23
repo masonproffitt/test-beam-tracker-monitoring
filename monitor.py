@@ -240,7 +240,7 @@ def plot_histograms(histograms):
     plt.close()
 
 
-def copy_histograms():
+def copy_histograms(run_number=-1):
     histogram_archive_directory_path = Path(histogram_archive_directory_name)
     if not histogram_archive_directory_path.exists():
         logging.info(f'creating {histogram_archive_directory_path}')
@@ -254,13 +254,13 @@ def copy_histograms():
         two_d_histogram_plot_path = Path(two_d_histogram_plot_filename)
         for path in [x_histogram_plot_path, y_histogram_plot_path, two_d_histogram_plot_path]:
             if path.exists():
-                new_histogram_plot_filename = datetime.datetime.now().isoformat(timespec='seconds') + '_' + path.name
+                new_histogram_plot_filename = datetime.datetime.now().isoformat(timespec='seconds')  + ('' if run_number < 0 else '_run' + str(run_number)) + '_' + path.name
                 logging.info(f'copying {path} to {histogram_archive_directory_path / new_histogram_plot_filename}')
                 shutil.copy(path, histogram_archive_directory_path / new_histogram_plot_filename)
     missing_hits_histogram_plot_filename = missing_hits_base_filename + histogram_plot_file_extension
     missing_hits_histogram_plot_path = Path(missing_hits_histogram_plot_filename)
     if missing_hits_histogram_plot_path.exists():
-        new_histogram_plot_filename = datetime.datetime.now().isoformat(timespec='seconds') + '_' + missing_hits_histogram_plot_path.name
+        new_histogram_plot_filename = datetime.datetime.now().isoformat(timespec='seconds') + ('' if run_number < 0 else '_run' + str(run_number)) + '_' + missing_hits_histogram_plot_path.name
         logging.info(f'copying {missing_hits_histogram_plot_path} to {histogram_archive_directory_path / new_histogram_plot_filename}')
         shutil.copy(missing_hits_histogram_plot_path, histogram_archive_directory_path / new_histogram_plot_filename)
 
@@ -299,6 +299,8 @@ while True:
         logging.info('new run number: ' + str(new_run_number))
         utils.write_run_start_time(time.time())
         write_last_run_number(new_run_number)
+        if archive_histograms:
+            copy_histograms(last_run_number)
         last_run_number = new_run_number
 
     run_start_update_time = run_start_time_path.stat().st_mtime
