@@ -11,9 +11,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import options
+import utils
 
 
 tracker_file_directory = '/home/daq/SiTrackerData/ascii_dream_2026'
+last_run_number_filename = 'run_number'
+daq_monitor_path = Path('/home/daq/DAQMon/Monitor_out.txt')
 backtrack = True
 loop_delay = 1
 x_min = 0
@@ -42,6 +45,7 @@ one_d_histogram_y_axis_rescale_factor = 1.1
 n_points = 3
 n_coordinates_per_point = 2
 
+last_run_number_file_byte_limit = 100
 run_start_time_file_byte_limit = 100
 run_start_time_min = 1e9
 run_start_time_max = 1e10
@@ -261,8 +265,41 @@ def copy_histograms():
         shutil.copy(missing_hits_histogram_plot_path, histogram_archive_directory_path / new_histogram_plot_filename)
 
 
+def read_last_run_number():
+    with open(last_run_number_filename) as f:
+        last_run_number = int(f.read(last_run_number_file_byte_limit))
+    logging.debug(f'{last_run_number=}')
+    return last_run_number
+
+
+def write_last_run_number(last_run_number):
+    with open(last_run_number_filename, 'w') as f:
+        f.write(str(last_run_number) + '\n')
+
+
+def read_current_run_number():
+    try:
+        with open(daq_monitor_path) as f:
+            l = f.readline()
+            run_number = int(l.split(':')[1])
+    except Exception as e:
+        logging.warning(e)
+        run_number = -1
+    logging.debug(f'{run_number=}')
+    return run_number
+
+
+last_run_number = read_last_run_number()
+logging.info('last run number: ' + str(last_run_number))
 while True:
     logging.debug('main loop start')
+
+    new_run_number = read_current_run_number()
+    if new_run_number > last_run_number:
+        logging.info('new run number: ' + str(new_run_number))
+        utils.write_run_start_time(time.time())
+        write_last_run_number(new_run_number)
+        last_run_number = new_run_number
 
     run_start_update_time = run_start_time_path.stat().st_mtime
     if run_start_update_time > last_run_start_update_time:

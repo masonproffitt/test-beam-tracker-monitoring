@@ -5,14 +5,12 @@ import time
 import zoneinfo
 
 import options
+import utils
 
 
 cern_time_zone = zoneinfo.ZoneInfo('Europe/Zurich')
 
 
 reset_time = time.time()
-
-with open(options.run_start_time_filename, 'w') as f:
-    f.write(str(reset_time) + '\n')
-
+utils.write_run_start_time(reset_time)
 print(f'Reset tracker histograms at {datetime.datetime.fromtimestamp(reset_time).astimezone(cern_time_zone).ctime()}')
