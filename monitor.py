@@ -312,8 +312,8 @@ while True:
             if archive_histograms:
                 copy_histograms()
             histograms = create_histograms()
+            plot_histograms(histograms)
             run_start_time = new_run_start_time
-            logging.debug(f'{run_start_time=}')
         last_run_start_update_time = run_start_update_time
 
     tracker_file_directory_update_time = tracker_file_directory_path.stat().st_mtime
