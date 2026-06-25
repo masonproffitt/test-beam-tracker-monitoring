@@ -43,6 +43,7 @@ recent_file_write_check_interval = 0.1
 one_d_histogram_y_axis_rescale_factor = 1.1
 n_files_filename = 'n_files_parsed'
 n_events_filename = 'n_events_parsed'
+pretty_run_start_time_filename = 'pretty_run_start_time'
 
 n_points = 3
 n_coordinates_per_point = 2
@@ -292,10 +293,10 @@ def read_current_run_number():
     return run_number
 
 
-def write_integer(integer, filename):
-    logging.debug(f'writing {filename}')
+def write_to_file(data, filename):
+    logging.debug(f'writing {data} to {filename}')
     with open(filename, 'w') as f:
-        f.write(str(integer) + '\n')
+        f.write(str(data) + '\n')
 
 
 last_run_number = read_last_run_number()
@@ -320,15 +321,17 @@ while True:
     if run_start_update_time > last_run_start_update_time:
         new_run_start_time = read_run_start_time(run_start_time_path)
         if new_run_start_time != run_start_time:
-            logging.info(f'read new run start time {datetime.datetime.fromtimestamp(new_run_start_time).astimezone(options.cern_time_zone).ctime()}')
+            pretty_run_start_time = datetime.datetime.fromtimestamp(new_run_start_time).astimezone(options.cern_time_zone).ctime()
+            logging.info(f'read new run start time {pretty_run_start_time}')
+            write_to_file(pretty_run_start_time, pretty_run_start_time_filename)
             if archive_histograms:
                 copy_histograms()
             histograms = create_histograms()
             n_files_parsed = 0
             n_events_parsed = 0
             plot_histograms(histograms)
-            write_integer(n_files_parsed, n_files_filename)
-            write_integer(n_events_parsed, n_events_filename)
+            write_to_file(n_files_parsed, n_files_filename)
+            write_to_file(n_events_parsed, n_events_filename)
             run_start_time = new_run_start_time
         last_run_start_update_time = run_start_update_time
 
@@ -367,8 +370,8 @@ while True:
             elif mtime > tracker_file_mtimes[fp]:
                 logging.warning(f'already parsed file has new mtime: {fp}')
         plot_histograms(histograms)
-        write_integer(n_files_parsed, n_files_filename)
-        write_integer(n_events_parsed, n_events_filename)
+        write_to_file(n_files_parsed, n_files_filename)
+        write_to_file(n_events_parsed, n_events_filename)
         latest_tracker_file_mtime = next_latest_tracker_file_mtime
         last_tracker_file_directory_update_time = tracker_file_directory_update_time
 
