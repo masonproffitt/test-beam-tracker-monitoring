@@ -43,13 +43,16 @@ for hbook_path in Path(hbook_file_directory).iterdir():
     dat_path = Path(options.dat_file_directory) / dat_filename
     if not dat_path.is_file():
         logging.debug(f'missing file {dat_path}')
-    else:
-        hbook_file_mtime = hbook_path.stat().st_mtime
-        logging.debug(f'{hbook_path=} {hbook_file_mtime=}')
-        for run_number in run_numbers:
-            if hbook_file_mtime > run_number_to_start_time_dict[run_number]:
-                run_number_to_dat_path_dict[run_number].append(dat_path)
-                break
+        continue
+    if dat_path.stat().st_size == 0:
+        logging.debug(f'skipping empty file {dat_path}')
+        continue
+    hbook_file_mtime = hbook_path.stat().st_mtime
+    logging.debug(f'{hbook_path=} {hbook_file_mtime=}')
+    for run_number in run_numbers:
+        if hbook_file_mtime > run_number_to_start_time_dict[run_number]:
+            run_number_to_dat_path_dict[run_number].append(dat_path)
+            break
 
 logging.debug(f'{run_number_to_dat_path_dict=}')
 
