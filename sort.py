@@ -32,7 +32,6 @@ for run_config_path in Path(options.daq_monitoring_directory).iterdir():
             run_number_to_dat_path_dict[run_number] = []
 
 logging.debug(f'{run_number_to_start_time_dict=}')
-
 run_numbers = list(run_number_to_start_time_dict.keys())
 run_numbers.sort(reverse=True)
 
@@ -67,7 +66,10 @@ for run_number in run_number_to_dat_path_dict.keys():
         run_directory_path.mkdir()
     for dat_path in run_number_to_dat_path_dict[run_number]:
         if (run_directory_path / dat_path.name).is_file():
-            logging.debug(f'skipping already existing file {run_directory_path / dat_path.name}')
-        else:
-            logging.debug(f'copying {dat_path} to {run_directory_path}')
-            shutil.copy2(dat_path, run_directory_path)
+            if (run_directory_path / dat_path.name).stat().st_size != dat_path.stat().st_size:
+                logging.info(f'updating already existing file {run_directory_path / dat_path.name}')
+            else:
+                logging.debug(f'skipping already existing file {run_directory_path / dat_path.name}')
+                continue
+        logging.debug(f'copying {dat_path} to {run_directory_path}')
+        shutil.copy2(dat_path, run_directory_path)
