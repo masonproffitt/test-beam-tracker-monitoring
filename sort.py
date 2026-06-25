@@ -44,7 +44,7 @@ for hbook_path in Path(hbook_file_directory).iterdir():
 
 logging.debug(f'{run_number_to_dat_path_dict=}')
 
-for run_number in run_number_dat_file_dict.keys():
+for run_number in run_number_to_dat_path_dict.keys():
     run_directory_path = Path(by_run_archive_directory) / str(run_number)
     if not run_directory_path.is_dir():
         logging.info(f'creating {run_directory_path}')
