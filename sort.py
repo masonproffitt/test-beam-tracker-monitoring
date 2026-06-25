@@ -45,10 +45,13 @@ for hbook_path in Path(hbook_file_directory).iterdir():
 logging.debug(f'{run_number_to_dat_path_dict=}')
 
 for run_number in run_number_dat_file_dict.keys():
-    run_directory = Path(by_run_archive_directory) / str(run_number)
-    if not run_directory.is_dir()
-        logging.info(f'creating {run_directory}')
-        run_directory.mkdir()
+    run_directory_path = Path(by_run_archive_directory) / str(run_number)
+    if not run_directory_path.is_dir()
+        logging.info(f'creating {run_directory_path}')
+        run_directory_path.mkdir()
     for dat_path in run_number_to_dat_path_dict[run_number]:
-        logging.info(f'copying {dat_path} to {run_directory}')
-        shutil.copy2(dat_path, run_directory)
+        if (run_directory_path / dat_path.name).is_file():
+            logging.debug(f'skipping already existing file {run_directory_path / dat_path.name}')
+        else:
+            logging.info(f'copying {dat_path} to {run_directory_path}')
+            shutil.copy2(dat_path, run_directory_path)
