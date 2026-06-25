@@ -1,3 +1,4 @@
+import datetime
 from pathlib import Path
 import logging
 import shutil
@@ -7,6 +8,7 @@ import options
 
 hbook_file_directory = '/home/daq/SiTrackerData/datadir_dream_2026'
 by_run_archive_directory = '/data/HG-DREAM/CERN/TrackerData/by_run'
+minimum_run_start_time = datetime.datetime(2026, 6, 22, 8, tzinfo=options.cern_time_zone)
 debug=False
 
 
@@ -22,8 +24,10 @@ run_number_to_dat_path_dict = {}
 for run_config_path in Path(options.daq_monitoring_directory).iterdir():
     if run_config_path.name.startswith(options.run_config_file_prefix) and run_config_path.name.endswith(options.run_config_file_extension):
         run_number = int(run_config_path.name.removeprefix(options.run_config_file_prefix).removesuffix(options.run_config_file_extension))
-        run_number_to_start_time_dict[run_number] = run_config_path.stat().st_mtime
-        run_number_to_dat_path_dict[run_number] = []
+        run_start_time = run_config_path.stat().st_mtime
+        if run_start_time >= minimum_run_start_time:
+            run_number_to_start_time_dict[run_number] = run_start_time
+            run_number_to_dat_path_dict[run_number] = []
 
 logging.debug(f'{run_number_to_start_time_dict=}')
 
