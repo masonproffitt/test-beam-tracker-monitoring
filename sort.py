@@ -28,7 +28,7 @@ for run_config_path in Path(options.daq_monitoring_directory).iterdir():
 logging.debug(f'{run_number_to_start_time_dict=}')
 
 run_numbers = list(run_number_to_start_time_dict.keys())
-run_numbers.sort()
+run_numbers.sort(reverse=True)
 
 for hbook_path in Path(hbook_file_directory).iterdir():
     if not hbook_path.name.endswith('.hbook'):
