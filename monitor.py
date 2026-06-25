@@ -308,7 +308,7 @@ while True:
     if run_start_update_time > last_run_start_update_time:
         new_run_start_time = read_run_start_time(run_start_time_path)
         if new_run_start_time != run_start_time:
-            logging.info(f'read new run start time {datetime.datetime.fromtimestamp(time.time()).astimezone(options.cern_time_zone).ctime()}')
+            logging.info(f'read new run start time {datetime.datetime.fromtimestamp(new_run_start_time).astimezone(options.cern_time_zone).ctime()}')
             if archive_histograms:
                 copy_histograms()
             histograms = create_histograms()
