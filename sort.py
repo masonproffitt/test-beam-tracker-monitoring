@@ -64,5 +64,5 @@ for run_number in run_number_to_dat_path_dict.keys():
         if (run_directory_path / dat_path.name).is_file():
             logging.debug(f'skipping already existing file {run_directory_path / dat_path.name}')
         else:
-            logging.info(f'copying {dat_path} to {run_directory_path}')
+            logging.debug(f'copying {dat_path} to {run_directory_path}')
             shutil.copy2(dat_path, run_directory_path)
