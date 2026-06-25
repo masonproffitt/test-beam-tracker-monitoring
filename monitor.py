@@ -298,7 +298,11 @@ while True:
     new_run_number = read_current_run_number()
     if new_run_number > last_run_number:
         logging.info('new run number: ' + str(new_run_number))
-        utils.write_run_start_time(time.time())
+        new_run_start_time = utils.look_up_run_start_time(new_run_number)
+        if new_run_start_time > 0:
+            utils.write_run_start_time(new_run_start_time)
+        else:
+            utils.write_run_start_time(time.time())
         write_last_run_number(new_run_number)
         if archive_histograms:
             copy_histograms(last_run_number)
