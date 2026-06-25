@@ -10,7 +10,7 @@ import options
 
 hbook_file_directory = '/home/daq/SiTrackerData/datadir_dream_2026'
 by_run_archive_directory = '/data/HG-DREAM/CERN/TrackerData/by_run'
-minimum_run_start_time = datetime.datetime(2026, 6, 22, 8, tzinfo=options.cern_time_zone)
+minimum_run_start_time = datetime.datetime(2026, 6, 22, 8, tzinfo=options.cern_time_zone).timestamp()
 debug=False
 
 
