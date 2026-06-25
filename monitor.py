@@ -41,6 +41,8 @@ debug = False
 recent_file_time_threshold = 60
 recent_file_write_check_interval = 0.1
 one_d_histogram_y_axis_rescale_factor = 1.1
+n_files_filename = 'n_files_parsed'
+n_events_filename = 'n_events_parsed'
 
 n_points = 3
 n_coordinates_per_point = 2
@@ -290,6 +292,12 @@ def read_current_run_number():
     return run_number
 
 
+def write_integer(integer, filename):
+    logging.debug(f'writing {filename}')
+    with open(filename, 'w') as f:
+        f.write(str(integer) + '\n')
+
+
 last_run_number = read_last_run_number()
 logging.info('last run number: ' + str(last_run_number))
 while True:
@@ -316,7 +324,11 @@ while True:
             if archive_histograms:
                 copy_histograms()
             histograms = create_histograms()
+            n_files_parsed = 0
+            n_events_parsed = 0
             plot_histograms(histograms)
+            write_integer(n_files_parsed, n_files_filename)
+            write_integer(n_events_parsed, n_events_filename)
             run_start_time = new_run_start_time
         last_run_start_update_time = run_start_update_time
 
@@ -349,10 +361,14 @@ while True:
                                 mtime = new_mtime
                     new_coordinates = parse(fp)
                     add_to_histograms(new_coordinates, histograms)
+                    n_files_parsed += 1
+                    n_events_parsed += len(new_coordinates)
                 tracker_file_mtimes[fp] = mtime
             elif mtime > tracker_file_mtimes[fp]:
                 logging.warning(f'already parsed file has new mtime: {fp}')
         plot_histograms(histograms)
+        write_integer(n_files_parsed, n_files_filename)
+        write_integer(n_events_parsed, n_events_filename)
         latest_tracker_file_mtime = next_latest_tracker_file_mtime
         last_tracker_file_directory_update_time = tracker_file_directory_update_time
 
