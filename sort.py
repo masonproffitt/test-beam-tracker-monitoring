@@ -89,7 +89,7 @@ while True:
                 else:
                     logging.debug(f'skipping already existing file {run_directory_path / dat_path.name}')
                     continue
-            logging.debug(f'copying {dat_path} to {run_directory_path}')
+            logging.info(f'copying {dat_path} to {run_directory_path}')
             shutil.copy2(dat_path, run_directory_path)
 
     loop_end_time = time.perf_counter()
