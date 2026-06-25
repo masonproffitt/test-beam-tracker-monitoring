@@ -33,7 +33,7 @@ for hbook_path in Path(hbook_file_directory).iterdir():
     dat_filename = hbook_path.name.removesuffix('.hbook') + '.dat'
     dat_path = Path(options.dat_file_directory) / dat_filename
     if not dat_path.is_file():
-        logging.warning(f'missing file {dat_path}')
+        logging.debug(f'missing file {dat_path}')
     else:
         hbook_file_mtime = hbook_path.stat().st_mtime
         logging.debug(f'{hbook_path=} {hbook_file_mtime=}')
