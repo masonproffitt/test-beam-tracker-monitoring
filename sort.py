@@ -6,6 +6,15 @@ import options
 
 hbook_directory = '/home/daq/SiTrackerData/datadir_dream_2026'
 by_run_archive_directory = '/data/HG-DREAM/CERN/TrackerData/by_run'
+debug=False
+
+
+if debug:
+    logging_level = logging.DEBUG
+else:
+    logging_level = logging.INFO
+
+logging.basicConfig(level=logging_level)
 
 run_number_to_start_time_dict = {}
 run_number_to_dat_file_dict = {}
