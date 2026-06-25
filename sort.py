@@ -40,7 +40,7 @@ while True:
                 run_number_to_dat_path_dict[run_number] = []
 
     after_run_loop_time = time.perf_counter()
-    logging.info(f'{after_run_loop_time - loop_start_time=}')
+    logging.debug(f'{after_run_loop_time - loop_start_time=}')
     logging.debug(f'{run_number_to_start_time_dict=}')
     run_numbers = list(run_number_to_start_time_dict.keys())
     run_numbers.sort(reverse=True)
@@ -72,7 +72,7 @@ while True:
         seen_dat_paths.add(dat_path)
 
     after_hbook_loop_time = time.perf_counter()
-    logging.info(f'{after_hbook_loop_time - after_run_loop_time=}')
+    logging.debug(f'{after_hbook_loop_time - after_run_loop_time=}')
     logging.debug(f'{run_number_to_dat_path_dict=}')
 
     for run_number in run_number_to_dat_path_dict.keys():
@@ -93,5 +93,5 @@ while True:
             shutil.copy2(dat_path, run_directory_path)
 
     loop_end_time = time.perf_counter()
-    logging.info(f'{loop_end_time - after_hbook_loop_time=}')
+    logging.debug(f'{loop_end_time - after_hbook_loop_time=}')
     time.sleep(loop_delay)
