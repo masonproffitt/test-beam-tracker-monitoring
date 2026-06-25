@@ -14,7 +14,6 @@ import options
 import utils
 
 
-tracker_file_directory = '/home/daq/SiTrackerData/ascii_dream_2026'
 last_run_number_filename = 'run_number'
 daq_monitor_path = Path('/home/daq/DAQMon/Monitor_out.txt')
 backtrack = True
@@ -54,7 +53,7 @@ run_start_time_min = 1e9
 run_start_time_max = 1e10
 
 run_start_time_path = Path(options.run_start_time_filename)
-tracker_file_directory_path = Path(tracker_file_directory)
+tracker_file_directory_path = Path(options.dat_file_directory)
 
 default_time = -1
 
