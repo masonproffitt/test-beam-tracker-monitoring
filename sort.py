@@ -25,6 +25,7 @@ logging.basicConfig(level=logging_level)
 
 run_number_to_start_time_dict = {}
 run_number_to_dat_path_dict = {}
+seen_dat_paths = set()
 
 while True:
     loop_start_time = time.perf_counter()
@@ -49,12 +50,13 @@ while True:
             continue
         done_path = Path(hbook_path.name + '.done')
         if not done_path.is_file():
-            logging.info(f'no done file {done_path}')
-            continue
+            logging.debug(f'no done file {done_path}')
         dat_filename = hbook_path.name.removesuffix('.hbook') + '.dat'
         underscore_index = dat_filename.index('_') + 1
         dat_filename = dat_filename[:underscore_index] + '0' + dat_filename[underscore_index:]
         dat_path = Path(options.dat_file_directory) / dat_filename
+        if dat_path in seen_dat_paths:
+            continue
         if not dat_path.is_file():
             logging.debug(f'missing file {dat_path}')
             continue
@@ -67,6 +69,7 @@ while True:
             if hbook_file_mtime > run_number_to_start_time_dict[run_number]:
                 run_number_to_dat_path_dict[run_number].append(dat_path)
                 break
+        seen_dat_paths.add(dat_path)
 
     after_hbook_loop_time = time.perf_counter()
     logging.info(f'{after_hbook_loop_time - after_run_loop_time=}')
