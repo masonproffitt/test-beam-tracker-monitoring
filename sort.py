@@ -49,8 +49,8 @@ while True:
         if not hbook_path.name.endswith('.hbook'):
             continue
         done_path = Path(hbook_path.name + '.done')
-        if not done_path.is_file():
-            logging.debug(f'no done file {done_path}')
+        # if not done_path.is_file():
+        #     logging.debug(f'no done file {done_path}')
         dat_filename = hbook_path.name.removesuffix('.hbook') + '.dat'
         underscore_index = dat_filename.index('_') + 1
         dat_filename = dat_filename[:underscore_index] + '0' + dat_filename[underscore_index:]
