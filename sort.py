@@ -22,7 +22,7 @@ for run_config_path in Path(options.daq_monitoring_directory).iterdir():
     if run_config_path.name.startswith(options.run_config_file_prefix) and run_config_path.name.endswith(options.run_config_file_extension):
         run_number = int(run_config_path.name.removeprefix(options.run_config_file_prefix).removesuffix(options.run_config_file_extension))
         run_number_to_start_time_dict[run_number] = run_config_path.stat().st_mtime
-        run_number_to_tracker_dat_file_dict[run_number] = []
+        run_number_to_dat_file_dict[run_number] = []
 
 run_numbers = list(run_number_to_start_time_dict.keys())
 run_numbers.sort()
