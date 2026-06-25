@@ -31,9 +31,11 @@ for hbook_path in Path(hbook_file_directory).iterdir():
     if not hbook_path.name.endswith('.hbook'):
         continue
     dat_filename = hbook_path.name.removesuffix('.hbook') + '.dat'
+    underscore_index = dat_filename.index('_') + 1
+    dat_filename = dat_filename[:underscore_index] + '0' + dat_filename[underscore_index:]
     dat_path = Path(options.dat_file_directory) / dat_filename
     if not dat_path.is_file():
-        logging.debug(f'missing file {dat_path}')
+        logging.warning(f'missing file {dat_path}')
     else:
         hbook_file_mtime = hbook_path.stat().st_mtime
         logging.debug(f'{hbook_path=} {hbook_file_mtime=}')
